@@ -9,9 +9,9 @@
            [uncomplicate.clojurecl.core :as clojurecl]
            [uncomplicate.clojurecl.info :as info]))
 
-(map info/info (clojurecl/platforms))
+;; (map info/info (clojurecl/platforms))
 
-(map info/info (clojurecl/devices (first (clojurecl/platforms))))
+;; (map info/info (clojurecl/devices (first (clojurecl/platforms))))
 
 
 (def v1 (dv -1 2 5.2 0))
