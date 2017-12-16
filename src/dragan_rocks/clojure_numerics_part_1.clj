@@ -39,14 +39,10 @@
 ;; 7 нулей
 (dv 7)
 ;; => #RealBlockVector[double, n:7, offset: 0, stride:1]
-;; [   0.00    0.00    0.00    ⋯      0.00    0.00 ]
-
+[   0.00    0.00    0.00    ⋯      0.00    0.00 ]
 
 ;; zeros-like
 (zero v2)
-;; => #RealBlockVector[double, n:22, offset: 0, stride:1]
-;; [   0.00    0.00    0.00    ⋯      0.00    0.00 ]
-
 
 (dge 3 2 [1 2 3 4 5 6] {:order :row})
 ;; => #RealGEMatrix[double, mxn:3x2, layout:column, offset:0]
