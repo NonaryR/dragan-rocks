@@ -29,12 +29,10 @@
 ;; => #RealBlockVector[double, n:4, offset: 0, stride:1]
 [  -2.50    5.00   13.00    0.00 ]
 
-
 ;; скалярное первого вектора и сумма со вторым
 (axpy! 2.5 v1 v3)
 ;; => #RealBlockVector[double, n:4, offset: 0, stride:1]
 [  -7.00    7.00   27.00    0.00 ]
-
 
 ;; 7 нулей
 (dv 7)
@@ -43,6 +41,9 @@
 
 ;; zeros-like
 (zero v2)
+;; => #RealBlockVector[double, n:22, offset: 0, stride:1]
+[   0.00    0.00    0.00    ⋯      0.00    0.00 ]
+
 
 (dge 3 2 [1 2 3 4 5 6] {:order :row})
 ;; => #RealGEMatrix[double, mxn:3x2, layout:column, offset:0]
@@ -51,6 +52,7 @@
    →       2.00    5.00         
    →       3.00    6.00         
    ┗                       ┛    
+
 
 
 (row (dge 2 3 (range 6)) 1)
