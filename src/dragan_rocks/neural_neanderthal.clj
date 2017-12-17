@@ -6,17 +6,18 @@
              [opencl :refer [with-default-engine clv clge] :as opencl]]
             [uncomplicate.commons.core :refer [with-release]]
             [uncomplicate.clojurecl
-             [core :refer [with-default finish!] :as clojurecl]
+             [core :refer [with-default finish! devices platforms] :as clojurecl]
              [info :as info]]
             [vertigo
              [bytes :refer [direct-buffer byte-seq]]
-             [structs :refer [wrap-byte-seq int8]]]))
+             [structs :refer [wrap-byte-seq int8]]])
+  (:import [org.jocl CL cl_device_id]))
 
-(map info/info (clojurecl/platforms))
+(map info/info (platforms))
 
-(map info/info (clojurecl/devices (first (clojurecl/platforms))))
+(map info/info (devices (first (platforms))))
 
-(clojurecl/devices (first (clojurecl/platforms)))
+(devices (first (platforms)))
 
 (def input-data
   (dge 4 3 [0 0 1
@@ -58,10 +59,9 @@
     (with-release [gpu-x (transfer! (fv 1 -2 3) (clv 3))]
         (asum gpu-x))))
 
-(def dev (first (clojurecl/devices (first (clojurecl/platforms)))))
-
 #_(let [work-sizes (clojurecl/work-size [1])
       host-msg (direct-buffer 16)
+      dev (first (clojurecl/devices (first (clojurecl/platforms))))
       program-source
       "__kernel void hello_kernel(__global char16 *msg) {\n    *msg = (char16)('H', 'e', 'l', 'l', 'o', ' ',
    'k', 'e', 'r', 'n', 'e', 'l', '!', '!', '!', '\\0');\n}\n"
@@ -80,3 +80,22 @@
     (apply str (map char
                     (wrap-byte-seq int8 (byte-seq host-msg))))))
 
+(def dev (first (devices (first (platforms)))))
+
+(let [err (int-array 1)
+      res (CL/clCreateContext nil 1 (into-array [dev]) nil nil err)]
+  (println (aget  err 0))
+  res)
+
+(defn context-fixed
+  ([devices properties ch user-data]
+   (clojurecl/context* (into-array cl_device_id devices)
+                       (and (seq properties) (clojurecl/context-properties properties))
+                       ch user-data))
+  ([devices]
+   (context-fixed devices nil nil nil))
+  ([]
+   (with-release [devs (devices)]
+     (context-fixed devs))))
+
+(context-fixed (devices (first (platforms))))
