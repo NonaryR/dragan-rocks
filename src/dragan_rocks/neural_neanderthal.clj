@@ -7,7 +7,8 @@
             [uncomplicate.commons.core :refer [with-release]]
             [uncomplicate.clojurecl
              [core :refer [with-default finish! devices platforms] :as clojurecl]
-             [info :as info]]
+             [info :as info]
+             [legacy :refer [with-default-1]]]
             [vertigo
              [bytes :refer [direct-buffer byte-seq]]
              [structs :refer [wrap-byte-seq int8]]])
@@ -23,7 +24,7 @@
   (dge 4 3 [0 0 1
             0 1 1
             1 0 1
-            1 1 1]))
+            1 1 1] {:layout :row}))
 
 (def output-data
   (dge 4 1 [0 1 1 0]))
@@ -49,36 +50,19 @@
 (n-core/dot (dv [2 3]) (dv [1 2]));; => 8.0
 
 
-#_(with-default
+(with-default-1
   (with-default-engine
     (asum (fv 1 -2 3))))
 
-
-#_(with-default
+(with-default-1
   (with-default-engine
-    (with-release [gpu-x (transfer! (fv 1 -2 3) (clv 3))]
-        (asum gpu-x))))
+    (with-release [gpu-x (clv 1 -2 5)]
+      (asum gpu-x))))
 
-#_(let [work-sizes (clojurecl/work-size [1])
-      host-msg (direct-buffer 16)
-      dev (first (clojurecl/devices (first (clojurecl/platforms))))
-      program-source
-      "__kernel void hello_kernel(__global char16 *msg) {\n    *msg = (char16)('H', 'e', 'l', 'l', 'o', ' ',
-   'k', 'e', 'r', 'n', 'e', 'l', '!', '!', '!', '\\0');\n}\n"
-      ]
-  (with-release
-    [
-     ctx (clojurecl/context [dev])
-     cqueue (clojurecl/command-queue ctx dev)
-     cl-msg (clojurecl/cl-buffer ctx 16 :write-only)
-     prog (clojurecl/build-program! (clojurecl/program-with-source ctx [program-source]))
-     hello-kernel (clojurecl/kernel prog "hello_kernel")
-     ]
-    (clojurecl/set-args! hello-kernel cl-msg)
-    (clojurecl/enq-nd! cqueue  hello-kernel work-sizes)
-    (clojurecl/enq-read! cqueue cl-msg host-msg)
-    (apply str (map char
-                    (wrap-byte-seq int8 (byte-seq host-msg))))))
+(with-default-1
+  (with-default-engine
+    (with-release [gpu-x (transfer! (fv -12 3) (clv 2))]
+        (asum gpu-x))))
 
 (def dev (first (devices (first (platforms)))))
 
