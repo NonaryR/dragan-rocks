@@ -6,9 +6,12 @@
              [opencl :refer [with-default-engine clv clge] :as opencl]]
             [uncomplicate.commons.core :refer [with-release]]
             [uncomplicate.clojurecl
-             [core :refer [with-default finish! devices platforms] :as clojurecl]
+             [core :refer [with-default finish! devices
+                           platforms with-platform
+                           sort-by-cl-version with-context
+                           context with-queue] :as clojurecl]
              [info :as info]
-             [legacy :refer [with-default-1]]]
+             [legacy :refer [with-default-1 command-queue-1] :as legacy]]
             [vertigo
              [bytes :refer [direct-buffer byte-seq]]
              [structs :refer [wrap-byte-seq int8]]])
@@ -53,16 +56,40 @@
 (with-default-1
   (with-default-engine
     (asum (fv 1 -2 3))))
+;; => 0.0
 
 (with-default-1
   (with-default-engine
     (with-release [gpu-x (clv 1 -2 5)]
       (asum gpu-x))))
+;; => 8.0
 
 (with-default-1
   (with-default-engine
     (with-release [gpu-x (transfer! (fv -12 3) (clv 2))]
         (asum gpu-x))))
+;; => 15.0
+
+(time
+ (with-default-1
+  (with-default-engine
+    (with-release [gpu-x (clv (range 100000000))
+                   gpu-y (copy gpu-x)]
+      (dot gpu-x gpu-y)))))
+
+; Native method as comparison
+(time
+ (let [x (dv (range 100000000))
+       y (copy x)]
+  (dot x y)))
+
+(with-platform (first (platforms))
+  (let [dev (first (sort-by-cl-version (devices :gpu)))]
+    (with-context (context [dev])
+      (with-queue (command-queue-1 dev)
+        (with-default-engine
+          (with-release [gpu-x (clv 1 -2 5)]
+            (asum gpu-x)))))))
 
 (def dev (first (devices (first (platforms)))))
 
