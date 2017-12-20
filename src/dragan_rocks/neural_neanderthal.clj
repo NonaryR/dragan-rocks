@@ -11,11 +11,7 @@
                            sort-by-cl-version with-context
                            context with-queue] :as clojurecl]
              [info :as info]
-             [legacy :refer [with-default-1 command-queue-1] :as legacy]]
-            [vertigo
-             [bytes :refer [direct-buffer byte-seq]]
-             [structs :refer [wrap-byte-seq int8]]])
-  (:import [org.jocl CL cl_device_id]))
+             [legacy :refer [with-default-1 command-queue-1] :as legacy]]))
 
 (map info/info (platforms))
 
@@ -50,8 +46,7 @@
                   0 0 1 0] )]
   (lin/svd a))
 
-(n-core/dot (dv [2 3]) (dv [1 2]));; => 8.0
-
+(dot (dv [2 3]) (dv [1 2]));; => 8.0
 
 (with-default-1
   (with-default-engine
@@ -67,7 +62,7 @@
 (with-default-1
   (with-default-engine
     (with-release [gpu-x (transfer! (fv -12 3) (clv 2))]
-        (asum gpu-x))))
+      (asum gpu-x))))
 ;; => 15.0
 
 (time
@@ -90,23 +85,3 @@
         (with-default-engine
           (with-release [gpu-x (clv 1 -2 5)]
             (asum gpu-x)))))))
-
-(def dev (first (devices (first (platforms)))))
-
-(let [err (int-array 1)
-      res (CL/clCreateContext nil 1 (into-array [dev]) nil nil err)]
-  (println (aget  err 0))
-  res)
-
-(defn context-fixed
-  ([devices properties ch user-data]
-   (clojurecl/context* (into-array cl_device_id devices)
-                       (and (seq properties) (clojurecl/context-properties properties))
-                       ch user-data))
-  ([devices]
-   (context-fixed devices nil nil nil))
-  ([]
-   (with-release [devs (devices)]
-     (context-fixed devs))))
-
-(context-fixed (devices (first (platforms))))

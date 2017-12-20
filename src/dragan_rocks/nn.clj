@@ -2,7 +2,12 @@
   (:require [denisovan.core]
             [clojure.core.matrix :as m]))
 
-(m/set-current-implementation :neanderthal)
+;; (m/set-current-implementation :neanderthal)
+;; => "Elapsed time: 49299.870419 msecs"
+
+(m/set-current-implementation :vectorz)
+;; => "Elapsed time: 4445.024843 msecs" 10 TIMES!!!
+
 
 (def input-data
  (m/matrix [[0 0 1]
@@ -54,5 +59,4 @@
           synaptic-weight-1 (update-weights synaptic-weight-1 layer-1 layer-2-grad)
           synaptic-weight-0 (update-weights synaptic-weight-0 layer-0 layer-1-grad)]
       (when (== 0 (rem i 100000))
-        (learn-log layer-2-error)
-        #_(m/pm (m/logistic (m/mmul (m/matrix [0 1 1]) synaptic-weight-0))))))))
+        (learn-log layer-2-error))))))
