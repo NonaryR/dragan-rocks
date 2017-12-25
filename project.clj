@@ -12,4 +12,5 @@
                  [org.clojure/core.async "0.3.465"]
                  [denisovan "0.1.0-SNAPSHOT"]
                  [criterium "0.4.4"]
-                 [midje "1.9.0"]])
+                 [midje "1.9.0" :exclusions [riddley potemkin]]]
+  :jvm-opts ["-Xmx8g" "-server"])
