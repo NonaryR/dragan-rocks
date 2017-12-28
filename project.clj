@@ -13,4 +13,6 @@
                  [denisovan "0.1.0-SNAPSHOT"]
                  [criterium "0.4.4"]
                  [midje "1.9.0" :exclusions [riddley potemkin]]]
+  :plugins [[lein-with-env-vars "0.1.0"]]
+  :env-vars {:DYLD_LIBRARY_PATH "/opt/intel/mkl/lib:/opt/intel/lib"}
   :jvm-opts ["-Xmx8g" "-server"])
