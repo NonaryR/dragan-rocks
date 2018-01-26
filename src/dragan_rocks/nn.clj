@@ -42,7 +42,7 @@
 (defn update-weights [weights layer next-layer-grad]
   (m/add! weights (m/mmul (m/transpose layer) next-layer-grad)))
 
-(time
+#_(time
  (let [out-count (first (m/shape output-data))
        layer-0 input-data
        synaptic-weight-0 (synaptic-weight 3 4)
